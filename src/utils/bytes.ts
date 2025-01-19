@@ -20,3 +20,13 @@ export function stringToBytes(str: string): string {
   while (n.length < 64) n = `${n}0`;
   return `0x${n}`;
 }
+
+export function formatTo4Decimals(num: number): number {
+    return Number(num.toFixed(4));
+}
+
+export function bigIntToNum(num: bigint, assetType: string): number {
+  return formatTo4Decimals(Number(num) / 1e18);
+}
+
+

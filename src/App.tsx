@@ -1,15 +1,20 @@
 import React from "react";
-import MetaMaskStatus from "./components/MetaMaskStatus";
+import AppHeader from "./components/AppHeader";
 import Form from "./components/Form";
+import List from "./components/List";
 
 function App() {
   return (
     <main className="sm:w-full md:w-[600px] mx-auto box-border p-2">
-      <header className="w-full ">
-        <MetaMaskStatus />
+      <header className="w-full">
+        <AppHeader />
       </header>
-      <section>
+      <section className="w-full">
         <Form />
+      </section>
+
+      <section className="w-full">
+        <List />
       </section>
     </main>
   );

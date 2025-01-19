@@ -1,29 +1,7 @@
 import { useSyncExternalStore } from "react";
+import { State, StateKeyOrKeys, Store } from "../types/store.types";
 
-export interface State {
-  currentId: string;
-  currentType: string;
-  fetchId: string;
-}
-
-type StateKeyOrKeys = keyof State | Array<keyof State>;
-
-interface Store {
-  state: State;
-  subscribers: Record<keyof State, Function[]>;
-  getState: () => State;
-  setPartial: (partial: Partial<State>) => void;
-  setState: (part: StateKeyOrKeys, newState: State) => void;
-  subscribe: (
-    part: StateKeyOrKeys,
-    subscriber: Function
-  ) => void;
-  notifySubscribers: (part: StateKeyOrKeys) => void;
-}
-
-let timeoutId: ReturnType<typeof setTimeout> | null = null;
-
-export const internalStore: Store = {
+export const store: Store = {
   state: {
     currentType: "",
     currentId: "",
@@ -37,27 +15,8 @@ export const internalStore: Store = {
   getState() {
     return this.state;
   },
-  setPartial(partial: Partial<State>) {
-    if (Object.keys(partial).includes("currentId")) {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-
-      timeoutId = setTimeout(() => {
-        this.setState("fetchId" as unknown as (keyof State)[], {
-          ...this.state,
-          fetchId: this.state.currentId,
-        });
-        timeoutId = null;
-      }, 1000);
-    }
-
-    this.setState(Object.keys(partial) as unknown as (keyof State)[], {
-      ...this.state,
-      ...partial,
-    });
-  },
-  setState(part: StateKeyOrKeys, newState: State) {
+  setState(part: StateKeyOrKeys, updateFunc: (state: State) => State) {
+    const newState = updateFunc(this.state);
     this.state = newState;
     this.notifySubscribers(part);
   },
@@ -74,35 +33,29 @@ export const internalStore: Store = {
   notifySubscribers(part: StateKeyOrKeys) {
     if (Array.isArray(part)) {
       part.forEach((p) => {
-        this.subscribers[p]?.forEach((subscriber) =>
-          subscriber()
-        );
+        this.subscribers[p]?.forEach((subscriber) => subscriber());
       });
     } else {
-      this.subscribers[part]?.forEach((subscriber) =>
-        subscriber()
-      );
+      this.subscribers[part]?.forEach((subscriber) => subscriber());
     }
   },
 };
 
 export function useCustomStore(part: StateKeyOrKeys) {
-  const getSnapshot = () => internalStore.getState();
+  const getSnapshot = () => store.getState();
   const subscribe = (callback: () => void) => {
-    internalStore.subscribe(part, callback);
+    store.subscribe(part, callback);
     return () => {
       if (Array.isArray(part)) {
         part.forEach((p) => {
-          internalStore.subscribers[p] =
-            internalStore.subscribers[p].filter(
-              (sub) => sub !== callback
-            );
-        });
-      } else {
-        internalStore.subscribers[part] =
-          internalStore.subscribers[part].filter(
+          store.subscribers[p] = store.subscribers[p].filter(
             (sub) => sub !== callback
           );
+        });
+      } else {
+        store.subscribers[part] = store.subscribers[
+          part
+        ].filter((sub) => sub !== callback);
       }
     };
   };
