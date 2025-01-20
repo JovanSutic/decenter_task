@@ -30,7 +30,7 @@ const Form = () => {
 
   return (
     <div className="pb-4 border-b-[1px] border-gray-300 mb-6">
-      <form className="w-full">
+      <form className="w-full" onSubmit={(e) => e.preventDefault()}>
         <div className="mb-4">
           <label
             htmlFor="collateral"

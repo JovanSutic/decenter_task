@@ -13,6 +13,7 @@ export interface State {
   ethRate: number | undefined;
   wbtcRate: number | undefined;
   usdcRate: number | undefined;
+  isMetamaskConnected: boolean;
 }
 
 export type StateKey = keyof State;

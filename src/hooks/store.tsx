@@ -12,6 +12,7 @@ export const store: Store = {
     wbtcRate: undefined,
     usdcRate: undefined,
     web3: null as Web3 | null,
+    isMetamaskConnected: false,
   },
   subscribers: {
     currentId: [],
@@ -22,6 +23,7 @@ export const store: Store = {
     wbtcRate: [],
     usdcRate: [],
     web3: [],
+    isMetamaskConnected: [],
   },
   getState() {
     return this.state;
