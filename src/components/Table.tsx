@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { CDPInfo } from "../types/cdp.types";
 import { bigIntToNum, formatToDecimals } from "../utils/numbers";
 import { store } from "../hooks/store";
