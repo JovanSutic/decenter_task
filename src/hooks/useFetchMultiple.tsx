@@ -1,44 +1,26 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import Web3 from "web3";
 import { bytesToString } from "../utils/bytes";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Bottleneck from "bottleneck";
-import { ABI, RATE_ABI } from "../utils/abi";
-import { CDPInfo, IlkInfo, UseFetchCDPResult } from "../types/cdp.types";
+import { CDP_ABI, cdpManagerAddress } from "../utils/constants";
+import { CDPInfo, UseFetchCDPResult } from "../types/cdp.types";
+import { useCustomStore } from "./store";
+import { IlkType } from "../types/store.types";
 
-export const useFetchCDP = (
+export const useFetchMultiple = (
   startPosition: string,
-  cdpType: string,
+  cdpType: IlkType | undefined,
   count = 20
 ): UseFetchCDPResult => {
-  const cdpManagerAddress = "0x68C61AF097b834c68eA6EA5e46aF6c04E8945B2d";
-  const ilkRateAddress = "0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b";
-  const infuraUrl = `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`;
-  const concurrentRequests = new Set<Promise<any>>();
+  const { web3 } = useCustomStore("web3");
 
-  const [web3, setWeb3] = useState<Web3 | null>(null);
-  const [ilkRate, setIlkRate] = useState<number>(1);
-  const [list, setList] = useState<CDPInfo[]>([]);
+  const [data, setData] = useState<CDPInfo[]>([]);
   const [progress, setProgress] = useState<number>(0);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (typeof window.ethereum !== "undefined") {
-      const newWeb3 = new Web3(window.ethereum);
-      setWeb3(newWeb3);
-    } else {
-      const newWeb3 = new Web3(new Web3.providers.HttpProvider(infuraUrl));
-      setWeb3(newWeb3);
-    }
-  }, []);
-
   const cdpManager = useMemo(() => {
-    return web3 ? new web3.eth.Contract(ABI, cdpManagerAddress) : null;
-  }, [web3]);
-
-  const rateManager = useMemo(() => {
-    return web3 ? new web3.eth.Contract(RATE_ABI, ilkRateAddress) : null;
+    return web3 ? new web3.eth.Contract(CDP_ABI, cdpManagerAddress) : null;
   }, [web3]);
 
   const limiter = useMemo(() => {
@@ -136,21 +118,6 @@ export const useFetchCDP = (
     [getCdpInfo, cdpType]
   );
 
-  const getIlkInfo = useCallback(async () => {
-    if (!web3 || !rateManager || !cdpType) return null;
-    try {
-      const ilkBytes32 = web3.utils.padRight(
-        web3.utils.asciiToHex(cdpType),
-        64
-      );
-
-      const result: IlkInfo = await rateManager.methods.ilks(ilkBytes32).call();
-      setIlkRate(Number(BigInt(result.rate)) / Number(BigInt(10 ** 27)));
-    } catch (error) {
-      setError("Error fetching ilk info.");
-    }
-  }, [cdpType, rateManager]);
-
   const main = useCallback(async () => {
     if (!cdpManager) {
       setError("Web3 not initialized");
@@ -160,7 +127,7 @@ export const useFetchCDP = (
     setLoading(true);
     try {
       const cdps = await fetchClosestCDPs(Number(startPosition));
-      setList(cdps.sort((a, b) => a.id - b.id));
+      setData(cdps.sort((a, b) => a.id - b.id));
     } catch (err) {
       setError(String(err));
     } finally {
@@ -169,42 +136,23 @@ export const useFetchCDP = (
   }, [startPosition, cdpType, cdpManager]);
 
   useEffect(() => {
-    let isMounted = true;
-
     const fetchCDP = async () => {
-      if (isMounted) {
-        await main();
-      }
-    };
-
-    const fetchIlk = async () => {
-      if (isMounted) {
-        await getIlkInfo();
-      }
+      await main();
     };
 
     if (startPosition && cdpType) {
       fetchCDP();
     } else {
-      setList([]);
+      setData([]);
       setError("");
       setProgress(0);
       if (loading) setLoading(false);
     }
 
-    if (cdpType && !startPosition) {
-      fetchIlk();
-    }
-
     if (error) {
       setError("");
     }
-
-    return () => {
-      isMounted = false;
-      concurrentRequests.forEach((promise) => promise.catch(() => {}));
-    };
   }, [startPosition, cdpType]);
 
-  return { list, error, loading, progress, ilkRate };
+  return { data, error, loading, progress };
 };

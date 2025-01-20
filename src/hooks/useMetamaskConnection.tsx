@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-export const useEth = () => {
+export const useMetamaskConnection = () => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isMetamask, setIsMetamask] = useState<boolean>(false);
 

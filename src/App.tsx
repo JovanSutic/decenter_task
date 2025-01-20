@@ -1,22 +1,22 @@
-import React from "react";
-import AppHeader from "./components/AppHeader";
-import Form from "./components/Form";
-import List from "./components/List";
+import { useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Single from "./pages/Single";
+import Layout from "./components/Layout";
+import { initWeb3 } from "./utils/web3Instance";
 
 function App() {
-  return (
-    <main className="sm:w-full md:w-[600px] mx-auto box-border p-2">
-      <header className="w-full">
-        <AppHeader />
-      </header>
-      <section className="w-full">
-        <Form />
-      </section>
+  useEffect(() => {
+    initWeb3();
+  }, []);
 
-      <section className="w-full">
-        <List />
-      </section>
-    </main>
+  return (
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Home />} />
+        <Route path=":id" element={<Single />} />
+      </Route>
+    </Routes>
   );
 }
 

@@ -70,7 +70,7 @@ const Form = () => {
           <input
             type="text"
             id="cpdId"
-            placeholder="Enter only numbers"
+            placeholder="Insert only numbers"
             disabled={!currentType}
             value={currentId}
             onChange={(event: any) =>
