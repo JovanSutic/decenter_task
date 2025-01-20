@@ -1,13 +1,11 @@
+import { Link, useNavigate } from "react-router-dom";
 import { CDPInfo } from "../types/cdp.types";
-import { bigIntToNum, bytesToString, formatTo4Decimals } from "../utils/bytes";
+import { bigIntToNum, formatToDecimals } from "../utils/numbers";
+import { store } from "../hooks/store";
 
-const Table = ({
-  list,
-  rate,
-}: {
-  list: CDPInfo[];
-  rate: number;
-}) => {
+const Table = ({ data, rate }: { data: CDPInfo[]; rate: number }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="relative overflow-x-auto rounded-xl border-[1px] border-gray-200">
       <table className="w-full  text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -28,9 +26,9 @@ const Table = ({
           </tr>
         </thead>
         <tbody>
-          {list.map((item, index) => (
+          {data.map((item, index) => (
             <tr
-              className={`bg-white ${index < list.length - 1 && "border-b"}`}
+              className={`bg-white ${index < data.length - 1 && "border-b"}`}
               key={item.id}
             >
               <th
@@ -40,17 +38,22 @@ const Table = ({
                 {item.id}
               </th>
               <td className="px-5 py-4">
-                {bigIntToNum(BigInt(item.collateral), bytesToString(item.ilk))}
+                {bigIntToNum(BigInt(item.collateral))}
               </td>
               <td className="px-5 py-4">
-                {formatTo4Decimals(
-                  bigIntToNum(BigInt(item.debt), "eth-a") * rate
-                )}
+                {formatToDecimals(bigIntToNum(BigInt(item.debt)) * rate)}
               </td>
               <td className="text-center">
                 <button
                   type="button"
                   className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-1.5 text-center inline-flex items-center me-2"
+                  onClick={() => {
+                    store.setState("currentCDP", (state) => ({
+                      ...state,
+                      currentCDP: item,
+                    }));
+                    navigate(`/${item.id}`);
+                  }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

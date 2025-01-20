@@ -1,19 +1,33 @@
 import { useSyncExternalStore } from "react";
-import { State, StateKeyOrKeys, Store } from "../types/store.types";
+import { State, StateKeyOrKeys, StateKey, Store } from "../types/store.types";
+import Web3 from "web3";
 
 export const store: Store = {
   state: {
-    currentType: "",
+    currentType: undefined,
     currentId: "",
     fetchId: "",
+    currentCDP: null,
+    ethRate: undefined,
+    wbtcRate: undefined,
+    usdcRate: undefined,
+    web3: null as Web3 | null,
   },
   subscribers: {
     currentId: [],
     currentType: [],
     fetchId: [],
+    currentCDP: [],
+    ethRate: [],
+    wbtcRate: [],
+    usdcRate: [],
+    web3: [],
   },
   getState() {
     return this.state;
+  },
+  getStateValue(value: StateKey) {
+    return this.state[value];
   },
   setState(part: StateKeyOrKeys, updateFunc: (state: State) => State) {
     const newState = updateFunc(this.state);

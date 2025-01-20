@@ -1,3 +1,5 @@
+import { IlkType } from "./store.types";
+
 export interface CDPInfo {
   id: number;
   ilk: string;
@@ -6,11 +8,10 @@ export interface CDPInfo {
 }
 
 export interface UseFetchCDPResult {
-  list: CDPInfo[];
+  data: CDPInfo[];
   error: string;
   loading: boolean;
   progress: number;
-  ilkRate: number;
 }
 
 export interface IlkInfo {
@@ -19,4 +20,19 @@ export interface IlkInfo {
   line: bigint;
   rate: bigint;
   spot: bigint;
+}
+
+export interface CollateralInfo {
+  price: number;
+  liquidationRatio: number;
+}
+
+export interface CDPDetails {
+  maxDebt: number;
+  maxWithdraw: number;
+  collateralRatio: number;
+  liquidationPrice: number;
+  debt: number;
+  collateral: number;
+  ilk: IlkType;
 }
