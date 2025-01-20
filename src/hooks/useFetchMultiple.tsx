@@ -25,7 +25,7 @@ export const useFetchMultiple = (
 
   const limiter = useMemo(() => {
     return new Bottleneck({
-      maxConcurrent: 5, // Adjust based on your needs
+      maxConcurrent: 5,
       minTime:
         web3 && web3.currentProvider instanceof Web3.providers.HttpProvider
           ? 300

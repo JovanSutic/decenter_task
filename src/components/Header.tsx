@@ -1,7 +1,11 @@
+import { useCustomStore } from "../hooks/store";
 import { useMetamaskConnection } from "../hooks/useMetamaskConnection";
 
 const Header = () => {
-  const { isConnected, isMetamask } = useMetamaskConnection();
+  const {isMetamaskConnected: isConnected} = useCustomStore('isMetamaskConnected');
+
+  const { isMetamask, connectToMetamask } =
+    useMetamaskConnection();
 
   return (
     <header className="bg-white">
@@ -17,11 +21,20 @@ const Header = () => {
           }`}</p>
         </div>
         {isMetamask && (
-          <div className="bg-gray-100 px-2 py-1 rounded text-xs text-gray-800">
-            <span className="font-bold">Wallet:</span>{" "}
-            <span className={isConnected ? "text-green-600" : "text-red-600"}>
-              {isConnected ? "Connected" : "Not Connected"}
-            </span>
+          <div>
+            {isConnected ? (
+              <div className="bg-gray-100 px-2 py-1 rounded text-xs text-gray-800">
+                <span className="font-bold">Wallet:</span>{" "}
+                <span className="text-green-600">Connected</span>
+              </div>
+            ) : (
+              <button
+                onClick={connectToMetamask}
+                className="bg-gray-100 px-2 py-1 rounded text-xs text-gray-800"
+              >
+                Connect you wallet
+              </button>
+            )}
           </div>
         )}
       </div>
