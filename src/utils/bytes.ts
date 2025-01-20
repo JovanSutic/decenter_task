@@ -1,3 +1,4 @@
+/* eslint-disable no-control-regex */
 import { Buffer } from "buffer";
 
 // Ensure Buffer is defined in the global scope if needed
