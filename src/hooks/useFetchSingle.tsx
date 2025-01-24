@@ -1,18 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { CDP_ABI, cdpManagerAddress } from "../utils/constants";
+import { useCallback, useEffect, useState } from "react";
 import { CDPInfo } from "../types/cdp.types";
-import { store, useCustomStore } from "./store";
+import { store } from "./store";
+import Web3Singleton from "../utils/web3Instance";
 
 export const useFetchSingle = (startPosition: string): any => {
-  const { web3 } = useCustomStore("web3");
-
   const [data, setData] = useState<CDPInfo>();
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
-  const cdpManager = useMemo(() => {
-    return web3 ? new web3.eth.Contract(CDP_ABI, cdpManagerAddress) : null;
-  }, [web3]);
+  const cdpManager = Web3Singleton.getCdpManager();
 
   const getCdpInfo = useCallback(
     async (cdpId: string): Promise<CDPInfo | null> => {
@@ -50,7 +46,7 @@ export const useFetchSingle = (startPosition: string): any => {
       await main();
     };
 
-    if (startPosition && web3) {
+    if (startPosition) {
       const currentCDP = store.getStateValue("currentCDP");
       if (currentCDP) {
         setData(currentCDP);
@@ -58,7 +54,7 @@ export const useFetchSingle = (startPosition: string): any => {
         fetchCDP();
       }
     }
-  }, [startPosition, web3]);
+  }, [startPosition]);
 
   return { data, error, loading };
 };

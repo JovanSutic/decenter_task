@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from "react";
 import { CDPInfo } from "../types/cdp.types";
 import { useCustomStore } from "../hooks/store";
+import Web3Singleton from "../utils/web3Instance";
 
 const CDPSignature = ({ data }: { data: CDPInfo }) => {
-  const { web3, isMetamaskConnected: isConnected } = useCustomStore([
-    "web3",
+  const web3 = Web3Singleton.getInstance();
+  const { isMetamaskConnected: isConnected } = useCustomStore([
     "isMetamaskConnected",
   ]);
 
@@ -22,7 +23,7 @@ const CDPSignature = ({ data }: { data: CDPInfo }) => {
         setError(err?.message);
       }
     };
-  }, [web3, data]);
+  }, [data]);
 
   if (isConnected) {
     return (

@@ -9,7 +9,6 @@ export interface State {
   currentType: IlkType | undefined;
   fetchId: string;
   currentCDP: null | CDPInfo,
-  web3: Web3 | null;
   ethRate: number | undefined;
   wbtcRate: number | undefined;
   usdcRate: number | undefined;
