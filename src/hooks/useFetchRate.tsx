@@ -1,25 +1,23 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { stringToBytes } from "../utils/bytes";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { RATE_ABI, ilkRateAddress, ilkRateMap } from "../utils/constants";
+import { useCallback, useEffect, useState } from "react";
+import { ilkRateMap } from "../utils/constants";
 import { IlkInfo } from "../types/cdp.types";
-import { useCustomStore, store } from "./store";
+import {  store } from "./store";
 import { IlkType, StateKey } from "../types/store.types";
+import Web3Singleton from "../utils/web3Instance";
 
 export const useFetchRate = (
   cdpType: IlkType | undefined
 ): { rate: number | undefined; loading: boolean; error: string;  } => {
-  const { web3 } = useCustomStore(["web3", "ethRate"]);
   const [rate, setRate] = useState<number | undefined>();
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
-  const rateManager = useMemo(() => {
-    return web3 ? new web3.eth.Contract(RATE_ABI, ilkRateAddress) : null;
-  }, [web3]);
+  const rateManager = Web3Singleton.getRateManager();
 
   const getIlkInfo = useCallback(async () => {
-    if (!web3 || !rateManager || !cdpType) return null;
+    if (!rateManager || !cdpType) return null;
     try {
       const ilkBytes32 = stringToBytes(cdpType);
 
@@ -56,7 +54,7 @@ export const useFetchRate = (
     if (error) {
       setError("");
     }
-  }, [cdpType, web3]);
+  }, [cdpType]);
 
   return { rate, loading, error };
 };

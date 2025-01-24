@@ -1,6 +1,5 @@
 import { useSyncExternalStore } from "react";
 import { State, StateKeyOrKeys, StateKey, Store } from "../types/store.types";
-import Web3 from "web3";
 
 export const store: Store = {
   state: {
@@ -11,7 +10,6 @@ export const store: Store = {
     ethRate: undefined,
     wbtcRate: undefined,
     usdcRate: undefined,
-    web3: null as Web3 | null,
     isMetamaskConnected: false,
   },
   subscribers: {
@@ -22,7 +20,6 @@ export const store: Store = {
     ethRate: [],
     wbtcRate: [],
     usdcRate: [],
-    web3: [],
     isMetamaskConnected: [],
   },
   getState() {
