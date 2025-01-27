@@ -3,6 +3,7 @@ import { State, StateKeyOrKeys, StateKey, Store } from "../types/store.types";
 
 export const store: Store = {
   state: {
+    provider: "Infura",
     currentType: undefined,
     currentId: "",
     fetchId: "",
@@ -13,6 +14,7 @@ export const store: Store = {
     isMetamaskConnected: false,
   },
   subscribers: {
+    provider: [],
     currentId: [],
     currentType: [],
     fetchId: [],
