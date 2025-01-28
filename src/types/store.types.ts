@@ -1,18 +1,19 @@
-import Web3 from "web3";
 import { CDPInfo } from "./cdp.types";
 
 
 const ilkTypes = ["ETH-A", "WBTC-A", "USDC-A"] as const;
 export type IlkType = (typeof ilkTypes)[number];
+
+type Provider = "Metamask" | "Infura";
 export interface State {
   currentId: string;
   currentType: IlkType | undefined;
   fetchId: string;
   currentCDP: null | CDPInfo,
-  web3: Web3 | null;
   ethRate: number | undefined;
   wbtcRate: number | undefined;
   usdcRate: number | undefined;
+  provider: Provider;
   isMetamaskConnected: boolean;
 }
 

@@ -1,37 +1,32 @@
 import Web3 from "web3";
 import { bytesToString } from "../utils/bytes";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Bottleneck from "bottleneck";
-import { CDP_ABI, cdpManagerAddress } from "../utils/constants";
 import { CDPInfo, UseFetchCDPResult } from "../types/cdp.types";
-import { useCustomStore } from "./store";
 import { IlkType } from "../types/store.types";
+import Web3Singleton from "../utils/web3Instance";
 
 export const useFetchMultiple = (
   startPosition: string,
   cdpType: IlkType | undefined,
   count = 20
 ): UseFetchCDPResult => {
-  const { web3 } = useCustomStore("web3");
+  const web3 = Web3Singleton.getInstance();
 
   const [data, setData] = useState<CDPInfo[]>([]);
   const [progress, setProgress] = useState<number>(0);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const cdpManager = useMemo(() => {
-    return web3 ? new web3.eth.Contract(CDP_ABI, cdpManagerAddress) : null;
-  }, [web3]);
+  const cdpManager = Web3Singleton.getCdpManager();
 
-  const limiter = useMemo(() => {
-    return new Bottleneck({
-      maxConcurrent: 5,
-      minTime:
-        web3 && web3.currentProvider instanceof Web3.providers.HttpProvider
-          ? 300
-          : 0,
-    });
-  }, [web3]);
+  const limiter = new Bottleneck({
+    maxConcurrent: 5,
+    minTime:
+      web3 && web3.currentProvider instanceof Web3.providers.HttpProvider
+        ? 300
+        : 0,
+  });
 
   const makeInfuraCall = useCallback(
     async (call: () => Promise<any>) => {
@@ -141,7 +136,9 @@ export const useFetchMultiple = (
     };
 
     if (startPosition && cdpType) {
-      fetchCDP();
+      if (!loading) {
+        fetchCDP();
+      }
     } else {
       setData([]);
       setError("");
