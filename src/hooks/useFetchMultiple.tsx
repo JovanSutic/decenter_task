@@ -136,7 +136,9 @@ export const useFetchMultiple = (
     };
 
     if (startPosition && cdpType) {
-      fetchCDP();
+      if (!loading) {
+        fetchCDP();
+      }
     } else {
       setData([]);
       setError("");
